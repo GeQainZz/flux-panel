@@ -89,4 +89,7 @@ public class ForwardWithTunnelDto {
     private Integer inx;
 
     private String interfaceName;
+
+
+    private String ssUri;
 }

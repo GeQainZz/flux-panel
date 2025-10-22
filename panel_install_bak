@@ -206,7 +206,7 @@ install_panel() {
     echo "⏭️ 跳过下载: gost.sql (使用当前位置的文件)"
   else
     echo "📡 下载数据库初始化文件..."
-    #curl -L -o gost.sql "$GOST_SQL_URL"
+    curl -L -o gost.sql "$GOST_SQL_URL"
   fi
   echo "✅ 文件准备完成"
 

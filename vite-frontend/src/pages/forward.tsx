@@ -46,6 +46,8 @@ import {
 } from "@/api";
 import { JwtUtil } from "@/utils/jwt";
 
+
+
 interface Forward {
   id: number;
   name: string;
@@ -54,6 +56,7 @@ interface Forward {
   inIp: string;
   inPort: number;
   remoteAddr: string;
+  ssUri: string;
   interfaceName?: string;
   strategy: string;
   status: number;
@@ -82,6 +85,7 @@ interface ForwardForm {
   remoteAddr: string;
   interfaceName?: string;
   strategy: string;
+  ssUri: string;
 }
 
 interface AddressItem {
@@ -118,6 +122,46 @@ interface TunnelGroup {
   tunnelName: string;
   forwards: Forward[];
 }
+
+interface HintWrapperProps {
+  disabled: boolean;
+  hint: string;
+  children: React.ReactNode;
+  className?: string;
+}
+
+function HintWrapper({ disabled, hint, children, className }: HintWrapperProps) {
+  return (
+      <span
+          className={`relative inline-flex group ${className ?? ""}`}
+          tabIndex={disabled ? 0 : -1}
+          aria-disabled={disabled || undefined}
+      >
+      {children}
+
+        {disabled && (
+            <span
+                role="tooltip"
+                className="
+            pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2
+            whitespace-nowrap rounded-md bg-black/80 px-2 py-1 text-xs text-white
+            opacity-0 group-hover:opacity-100 group-focus:opacity-100 group-focus-within:opacity-100
+            transition-opacity z-50
+          "
+            >
+          {hint}
+              <span
+                  className="
+              absolute left-1/2 top-full -translate-x-1/2
+              border-4 border-transparent border-t-black/80
+            "
+              />
+        </span>
+        )}
+    </span>
+  );
+}
+
 
 export default function ForwardPage() {
   const [loading, setLoading] = useState(true);
@@ -183,7 +227,8 @@ export default function ForwardPage() {
     message: string;
     forwardName?: string;
   }>>([]);
-  
+
+
   // 表单状态
   const [form, setForm] = useState<ForwardForm>({
     name: '',
@@ -191,7 +236,8 @@ export default function ForwardPage() {
     inPort: null,
     remoteAddr: '',
     interfaceName: '',
-    strategy: 'fifo'
+    strategy: 'fifo',
+    ssUri: ''
   });
   
   // 表单验证错误
@@ -444,7 +490,8 @@ export default function ForwardPage() {
       inPort: null,
       remoteAddr: '',
       interfaceName: '',
-      strategy: 'fifo'
+      strategy: 'fifo',
+      ssUri: ''
     });
     setSelectedTunnel(null);
     setErrors({});
@@ -462,7 +509,8 @@ export default function ForwardPage() {
       inPort: forward.inPort,
       remoteAddr: forward.remoteAddr.split(',').join('\n'),
       interfaceName: forward.interfaceName || '',
-      strategy: forward.strategy || 'fifo'
+      strategy: forward.strategy || 'fifo',
+      ssUri: forward.ssUri || ''
     });
     const tunnel = tunnels.find(t => t.id === forward.tunnelId);
     setSelectedTunnel(tunnel || null);
@@ -541,6 +589,7 @@ export default function ForwardPage() {
           inPort: form.inPort,
           remoteAddr: processedRemoteAddr,
           interfaceName: form.interfaceName,
+          ssUri: form.ssUri,
           strategy: addressCount > 1 ? form.strategy : 'fifo'
         };
         res = await updateForward(updateData);
@@ -552,6 +601,7 @@ export default function ForwardPage() {
           inPort: form.inPort,
           remoteAddr: processedRemoteAddr,
           interfaceName: form.interfaceName,
+          ssUri: form.ssUri,
           strategy: addressCount > 1 ? form.strategy : 'fifo'
         };
         res = await createForward(createData);
@@ -1301,32 +1351,48 @@ export default function ForwardPage() {
             >
               编辑
             </Button>
-            <Button
-              size="sm"
-              variant="flat"
-              color="warning"
-              onPress={() => handleDiagnose(forward)}
-              className="flex-1 min-h-8"
-              startContent={
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              }
+            <HintWrapper
+                disabled={Boolean(forward?.ssUri)}
+                hint="暂不支持链式代理诊断"
             >
-              诊断
-            </Button>
+              <Button
+                  size="sm"
+                  variant="flat"
+                  color="warning"
+                  className="flex-1 min-h-8"
+                  startContent={
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                          fillRule="evenodd"
+                          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                      />
+                    </svg>
+                  }
+                  isDisabled={Boolean(forward?.ssUri)}
+                  onPress={() => {
+                    if (!forward?.ssUri) {
+                      handleDiagnose(forward);
+                    }
+                  }}
+              >
+                诊断
+              </Button>
+            </HintWrapper>
             <Button
-              size="sm"
-              variant="flat"
-              color="danger"
-              onPress={() => handleDelete(forward)}
-              className="flex-1 min-h-8"
-              startContent={
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clipRule="evenodd" />
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 012 0v4a1 1 0 11-2 0V7zM12 7a1 1 0 012 0v4a1 1 0 11-2 0V7z" clipRule="evenodd" />
-                </svg>
-              }
+                size="sm"
+                variant="flat"
+                color="danger"
+                onPress={() => handleDelete(forward)}
+                className="flex-1 min-h-8"
+                startContent={
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clipRule="evenodd"/>
+                    <path fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 012 0v4a1 1 0 11-2 0V7zM12 7a1 1 0 012 0v4a1 1 0 11-2 0V7z"
+                          clipRule="evenodd"/>
+                  </svg>
+                }
             >
               删除
             </Button>
@@ -1602,8 +1668,8 @@ export default function ForwardPage() {
                       type="number"
                       value={form.inPort?.toString() || ''}
                       onChange={(e) => setForm(prev => ({ 
-                        ...prev, 
-                        inPort: e.target.value ? parseInt(e.target.value) : null 
+                        ...prev,
+                        inPort: e.target.value ? parseInt(e.target.value) : null
                       }))}
                       isInvalid={!!errors.inPort}
                       errorMessage={errors.inPort}
@@ -1613,6 +1679,21 @@ export default function ForwardPage() {
                           ? `允许范围: ${selectedTunnel.inNodePortSta}-${selectedTunnel.inNodePortEnd}`
                           : '留空将自动分配可用端口'
                       }
+                    />
+
+                    <Input
+                        label="ss隧道"
+                        placeholder="输入可在中转前增加ss链式隧道，节点->ss->出口"
+                        type="text"
+                        value={form.ssUri || ''}
+                        onChange={(e) => setForm(prev => ({
+                          ...prev,
+                          ssUri: e.target.value
+                        }))}
+                        variant="bordered"
+                        description={
+                          'ss://***@ip:port?type=tcp#name'
+                        }
                     />
                     
                     <Textarea

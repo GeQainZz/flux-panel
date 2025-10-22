@@ -114,6 +114,7 @@ public class FlowController extends BaseController {
             checkGostConfigAsync.cleanNodeConfigs(node.getId().toString(), gostConfigDto);
 
             log.info("🔓 节点 {} 配置数据接收成功{}", node.getId(), isEncryptedMessage(rawData) ? "（已解密）" : "");
+            log.info("🔓 节点 {} 配置数据{}", node.getId(), decryptedData);
 
         } catch (Exception e) {
             log.error("处理节点 {} 配置数据失败: {}", node.getId(), e.getMessage());

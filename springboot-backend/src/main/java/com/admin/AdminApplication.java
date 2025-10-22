@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class AdminApplication {
 
     public static void main(String[] args) {
+        System.out.println("魔改版本启动成功");
         SpringApplication.run(AdminApplication.class, args);
     }
 
