@@ -41,4 +41,7 @@ public class TunnelUpdateDto {
 
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String interfaceName;
+
+
+    private String ssUri;
 } 

@@ -370,7 +370,7 @@ public class GostUtil {
     }
     // 解析 SIP002 兼容的 ss://URI
     public static SsOption parseSsUri(String ssUri) {
-        if (ssUri == null || !ssUri.startsWith("ss://")) return null;
+        if (ssUri == null || !ssUri.startsWith("ss://")) throw new RuntimeException("ss转换失败");
 
         String raw = ssUri.substring("ss://".length());     // 去掉协议头
         String tag = null;

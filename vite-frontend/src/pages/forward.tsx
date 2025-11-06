@@ -1682,6 +1682,7 @@ export default function ForwardPage() {
                     />
 
                     <Input
+                        className={"hidden"}
                         label="ss隧道"
                         placeholder="输入可在中转前增加ss链式隧道，节点->ss->出口"
                         type="text"

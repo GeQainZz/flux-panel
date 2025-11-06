@@ -178,7 +178,10 @@ public class TunnelServiceImpl extends ServiceImpl<TunnelMapper, Tunnel> impleme
         if (!Objects.equals(existingTunnel.getTcpListenAddr(), tunnelUpdateDto.getTcpListenAddr()) ||
                 !Objects.equals(existingTunnel.getUdpListenAddr(), tunnelUpdateDto.getUdpListenAddr()) ||
                 !Objects.equals(existingTunnel.getProtocol(), tunnelUpdateDto.getProtocol()) ||
-                !Objects.equals(existingTunnel.getInterfaceName(), tunnelUpdateDto.getInterfaceName())) {
+                !Objects.equals(existingTunnel.getInterfaceName(), tunnelUpdateDto.getInterfaceName()) ||
+                !Objects.equals(existingTunnel.getSsUri(), tunnelUpdateDto.getSsUri())
+
+        ) {
             up++;
         }
 
@@ -191,6 +194,7 @@ public class TunnelServiceImpl extends ServiceImpl<TunnelMapper, Tunnel> impleme
         existingTunnel.setTrafficRatio(tunnelUpdateDto.getTrafficRatio());
         existingTunnel.setProtocol(tunnelUpdateDto.getProtocol());
         existingTunnel.setInterfaceName(tunnelUpdateDto.getInterfaceName());
+        existingTunnel.setSsUri(tunnelUpdateDto.getSsUri());
         this.updateById(existingTunnel);
         int err = 0;
         if (up != 0){
@@ -207,6 +211,7 @@ public class TunnelServiceImpl extends ServiceImpl<TunnelMapper, Tunnel> impleme
                     forwardUpdateDto.setStrategy(forward.getStrategy());
                     forwardUpdateDto.setInPort(forward.getInPort());
                     forwardUpdateDto.setInterfaceName(forward.getInterfaceName());
+                    forwardUpdateDto.setSsUri(tunnelUpdateDto.getSsUri());
                     R r = forwardService.updateForward(forwardUpdateDto);
                     if (r.getCode() != 0){
                         err++;

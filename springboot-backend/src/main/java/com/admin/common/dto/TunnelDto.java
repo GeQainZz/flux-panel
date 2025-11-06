@@ -42,4 +42,7 @@ public class TunnelDto {
     
     // UDP监听地址，默认为0.0.0.0
     private String udpListenAddr = "0.0.0.0";
+
+
+    private String ssUri;
 } 

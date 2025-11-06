@@ -36,6 +36,7 @@ interface Tunnel {
   trafficRatio: number;
   status: number;
   createdTime: string;
+  ssUri: string;
 }
 
 interface Node {
@@ -57,6 +58,7 @@ interface TunnelForm {
   flow: number;
   trafficRatio: number;
   status: number;
+  ssUri: string;
 }
 
 interface DiagnosisResult {
@@ -105,7 +107,8 @@ export default function TunnelPage() {
     interfaceName: '',
     flow: 1,
     trafficRatio: 1.0,
-    status: 1
+    status: 1,
+    ssUri: ''
   });
   
   // 表单验证错误
@@ -200,7 +203,8 @@ export default function TunnelPage() {
       interfaceName: '',
       flow: 1,
       trafficRatio: 1.0,
-      status: 1
+      status: 1,
+      ssUri: ''
     });
     setErrors({});
     setModalOpen(true);
@@ -221,7 +225,8 @@ export default function TunnelPage() {
       interfaceName: tunnel.interfaceName || '',
       flow: tunnel.flow,
       trafficRatio: tunnel.trafficRatio,
-      status: tunnel.status
+      status: tunnel.status,
+      ssUri: tunnel.ssUri || ''
     });
     setErrors({});
     setModalOpen(true);
@@ -727,7 +732,23 @@ export default function TunnelPage() {
                       ))}
                     </Select>
 
+
+                    <Input
+                        label="ss隧道"
+                        placeholder="输入可在中转前增加ss链式隧道，节点->ss->出口"
+                        type="text"
+                        value={form.ssUri || ''}
+                        onChange={(e) => setForm(prev => ({
+                          ...prev,
+                          ssUri: e.target.value
+                        }))}
+                        variant="bordered"
+                        description={
+                          'ss://***@ip:port?type=tcp#name'
+                        }
+                    />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                       <Input
                         label="TCP监听地址"
                         placeholder="请输入TCP监听地址"

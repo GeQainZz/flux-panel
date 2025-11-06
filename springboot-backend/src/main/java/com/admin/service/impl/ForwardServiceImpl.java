@@ -14,8 +14,10 @@ import com.admin.service.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.alibaba.fastjson.JSONObject;
+import freemarker.template.utility.StringUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -77,6 +79,10 @@ public class ForwardServiceImpl extends ServiceImpl<ForwardMapper, Forward> impl
         if (tunnel.getStatus() != TUNNEL_STATUS_ACTIVE) {
             return R.err("隧道已禁用，无法创建转发");
         }
+
+        //if(StringUtils.isNotBlank(tunnel.getSsUri())){
+            forwardDto.setSsUri(tunnel.getSsUri());
+        //}
 
         // 3. 普通用户权限和限制检查
         UserPermissionResult permissionResult = checkUserPermissions(currentUser, tunnel, null);
@@ -153,6 +159,12 @@ public class ForwardServiceImpl extends ServiceImpl<ForwardMapper, Forward> impl
         if (tunnel.getStatus() != TUNNEL_STATUS_ACTIVE) {
             return R.err("隧道已禁用，无法更新转发");
         }
+
+        //if(StringUtils.isNotBlank(tunnel.getSsUri())){
+            forwardUpdateDto.setSsUri(tunnel.getSsUri());
+        //}
+
+
         boolean tunnelChanged = isTunnelChanged(existForward, forwardUpdateDto);
         // 4. 检查权限和限制
         UserPermissionResult permissionResult = null;
@@ -214,8 +226,10 @@ public class ForwardServiceImpl extends ServiceImpl<ForwardMapper, Forward> impl
             userTunnel = getUserTunnel(existForward.getUserId(), tunnel.getId().intValue());
         }
 
+        log.info("修改隧道forwardUpdateDto ：{}",JSONObject.toJSONString(forwardUpdateDto));
         // 6. 更新Forward对象
         Forward updatedForward = updateForwardEntity(forwardUpdateDto, existForward, tunnel);
+        log.info("修改隧道updatedForward ：{}",JSONObject.toJSONString(forwardUpdateDto));
 
         // 7. 获取所需的节点信息
         NodeInfo nodeInfo = getRequiredNodes(tunnel);
