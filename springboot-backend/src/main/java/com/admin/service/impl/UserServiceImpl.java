@@ -195,8 +195,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return 分页用户列表响应
      */
     @Override
-    public R getAllUsers() {
-        return R.ok(this.list(new QueryWrapper<User>().ne("role_id", ADMIN_ROLE_ID)));
+    public R getAllUsers(String keyword) {
+        return R.ok(this.list(new QueryWrapper<User>().ne("role_id", ADMIN_ROLE_ID).like(StringUtils.isNotBlank(keyword),"user",keyword)));
     }
 
     /**

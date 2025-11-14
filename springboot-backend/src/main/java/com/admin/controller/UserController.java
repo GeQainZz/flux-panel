@@ -40,8 +40,8 @@ public class UserController extends BaseController {
     @LogAnnotation
     @RequireRole
     @PostMapping("/list")
-    public R readAll() {
-        return userService.getAllUsers();
+    public R readAll(@RequestBody Map<String, Object> params) {
+        return userService.getAllUsers(String.valueOf(params.get("keyword")));
     }
 
     @LogAnnotation
